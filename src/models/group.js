@@ -4,4 +4,8 @@ export class Group {
     this.teams = [];
     this.matches = [];
   }
+
+  addTeam(team) {
+    this.teams.push(team);
+  }
 }
