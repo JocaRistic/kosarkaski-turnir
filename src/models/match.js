@@ -1,7 +1,8 @@
 export class Match {
-  constructor(team1, team2) {
+  constructor(team1, team2, round) {
     this.team1 = team1;
     this.team2 = team2;
+    this.round = round;
     this.team1Score = 0;
     this.team2Score = 0;
     this.winner = null;
@@ -49,7 +50,7 @@ export class Match {
 
   // Vraca rezultat
   getResult() {
-    return `${this.team1} - ${this.team2} (${this.team1Score}:${this.team2Score})`;
+    return `${this.team1.name} - ${this.team2.name} (${this.team1Score}:${this.team2Score})`;
   }
 }
 
