@@ -1,15 +1,18 @@
+import { Match } from "./match.js";
+
 export class Tournament {
   constructor() {
     this.groups = [];
     this.groupPhaseResults = [];
     this.eliminationPhaseQualifiers = [];
+    this.quarterfinalsMatches = [];
   }
 
   addGroup(group) {
     this.groups.push(group);
   }
 
-  // Simulacija grupne faze turnira
+  // Metoda poziva sve metode potrebne za simulaciju grupne faze
   simulateGroupPhase() {
     this.groups.forEach((group) => {
       group.simulateAllGroupMatches();
@@ -49,7 +52,72 @@ export class Tournament {
       team.addGroupRank(index + 1);
     });
 
+    // Cuvamo prva 8 najbolje plasirana tima
     this.eliminationPhaseQualifiers = finalRanking.slice(0, 8);
+  }
+
+  // Metoda rasporedjuje kvalifikovane timove po sesirima, i pravi parove za cetvrtfinala tako sto ukrsta timove
+  drawQuarterfinalPairs() {
+    const hats = {
+      D: [],
+      E: [],
+      F: [],
+      G: [],
+    };
+
+    this.eliminationPhaseQualifiers.forEach((team) => {
+      if (team.afterGroupRank === 1 || team.afterGroupRank === 2) {
+        hats.D.push(team);
+      } else if (team.afterGroupRank === 3 || team.afterGroupRank === 4) {
+        hats.E.push(team);
+      } else if (team.afterGroupRank === 5 || team.afterGroupRank === 6) {
+        hats.F.push(team);
+      } else if (team.afterGroupRank === 7 || team.afterGroupRank === 8) {
+        hats.G.push(team);
+      }
+    });
+
+    this.quarterfinalsMatches.push(
+      this.generateQuarterfinalPairs(hats.D, hats.G)
+    );
+    this.quarterfinalsMatches.push(
+      this.generateQuarterfinalPairs(hats.E, hats.F)
+    );
+
+    this.displayHatsAndQuarterPairs(hats);
+  }
+
+  // Formiraju se parovi nasumicnim ukrstanjem prosledjenih sesira, par ne mogu ciniti timovi koji su vec igrali medjusobno u grupnoj fazi
+  generateQuarterfinalPairs(hat1, hat2) {
+    let match1team1, match1team2, match2team1, match2team2;
+    do {
+      match1team1 = hat1[Math.floor(Math.random() * hat1.length)];
+      match1team2 = hat2[Math.floor(Math.random() * hat2.length)];
+      match2team1 = hat1.find((team) => team.name !== match1team1.name);
+      match2team2 = hat2.find((team) => team.name !== match1team2.name);
+    } while (
+      this.checkIfTeamsPlayedInGroup(match1team1, match1team2) ||
+      this.checkIfTeamsPlayedInGroup(match2team1, match2team2)
+    );
+
+    return [
+      new Match(match1team1, match1team2, 4),
+      new Match(match2team1, match2team2, 4),
+    ];
+  }
+
+  // Provera da li su timovi igrali medjusobno u grupnoj fazi, vraca true ako jesu, false ako nisu
+  checkIfTeamsPlayedInGroup(team1, team2) {
+    let played = false;
+    this.groups.forEach((group) => {
+      played = group.matches.some(
+        (match) =>
+          (team1.name === match.team1.name &&
+            team2.name === match.team2.name) ||
+          (team1.name === match.team2.name && team2.name === match.team1.name)
+      );
+    });
+    return played;
   }
 
   // Prikaz rezultata grupne faze turnira
@@ -110,6 +178,28 @@ export class Tournament {
     console.log("");
     this.eliminationPhaseQualifiers.forEach((team) => {
       console.log(`${team.afterGroupRank}. ${team.name}`);
+    });
+  }
+
+  // Prikaz sesira
+  displayHatsAndQuarterPairs(hats) {
+    console.log("");
+    console.log("=========== ELIMINACIONA FAZA ===========");
+    console.log("");
+    console.log("Sesiri:");
+    for (const hat in hats) {
+      console.log(`   Sesir ${hat}`);
+      hats[hat].forEach((team) => {
+        console.log(`       ${team.name}`);
+      });
+    }
+    console.log("");
+    console.log(`Parovi eliminacione faze: `);
+    this.quarterfinalsMatches.forEach((matches) => {
+      matches.forEach((match) => {
+        console.log(`   ${match.team1.name} - ${match.team2.name}`);
+      });
+      console.log("");
     });
   }
 }

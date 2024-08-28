@@ -20,3 +20,4 @@ for (const group in groupsLoaded) {
 }
 
 tournament.simulateGroupPhase();
+tournament.drawQuarterfinalPairs();
