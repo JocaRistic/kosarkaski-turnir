@@ -55,4 +55,71 @@ export class Group {
 
     return rounds;
   }
+
+  // Rangiranje timova u grupi
+  rankTeamsInGroup() {
+    this.teams.sort((team1, team2) => {
+      if (team2.points !== team1.points) {
+        return team2.points - team1.points;
+      }
+
+      // Ako dva tima imaju isti broj bodova, gledamo medjusobni susret
+      const match = this.findMatch(team1, team2);
+
+      if (match) {
+        return match.winner.name === team1.name ? -1 : 1;
+      }
+    });
+
+    // Proverava da li postoje tri tima sa istim brojem bodova, ukoliko postoje pozivamo metodu koja ih sortira
+    const teamsWithSamePoints = {};
+
+    this.teams.forEach((team) => {
+      if (!teamsWithSamePoints[team.points]) {
+        teamsWithSamePoints[team.points] = [];
+      }
+      teamsWithSamePoints[team.points].push(team);
+    });
+
+    Object.values(teamsWithSamePoints).forEach((teams) => {
+      if (teams.length > 2) {
+        this.resolve3TeamsEqualPoints(teams);
+      }
+    });
+  }
+
+  // Proverava da li postoje tri tima sa istim brojem bodova, ukoliko postoje rangira ih po razlici u poenima u medj. duelima
+  resolve3TeamsEqualPoints(teams) {
+    const pointDifferences = {};
+
+    teams.forEach((team) => {
+      pointDifferences[team.name] = 0;
+    });
+
+    this.matches.forEach((match) => {
+      if (teams.includes(match.team1) && teams.includes(match.team2)) {
+        // console.log(match);
+        const diff1 = match.team1Score - match.team2Score;
+        const diff2 = match.team2Score - match.team1Score;
+        pointDifferences[match.team1.name] += diff1;
+        pointDifferences[match.team2.name] += diff2;
+      }
+    });
+
+    // console.log(pointDifferences);
+
+    this.teams.sort(
+      (team1, team2) =>
+        pointDifferences[team2.name] - pointDifferences[team1.name]
+    );
+  }
+
+  // Pronadji mec koji su odigrali prosledjeni timovi
+  findMatch(team1, team2) {
+    return this.matches.find(
+      (match) =>
+        (team1.name === match.team1.name && team2.name === match.team2.name) ||
+        (team1.name === match.team2.name && team2.name === match.team1.name)
+    );
+  }
 }
