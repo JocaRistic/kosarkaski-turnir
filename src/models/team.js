@@ -8,6 +8,7 @@ export class Team {
     this.losses = 0;
     this.scoredPoints = 0;
     this.receivedPoints = 0;
+    this.afterGroupRank;
   }
 
   // Azuriranje podataka za tim nakon meca
@@ -21,5 +22,10 @@ export class Team {
       this.losses += 1;
       this.points += 1;
     }
+  }
+
+  // Dodaj rank tima nakon grupne faze
+  addGroupRank(rank) {
+    this.afterGroupRank = rank;
   }
 }
