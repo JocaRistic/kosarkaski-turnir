@@ -6,6 +6,7 @@ export class Match {
     this.team1Score = 0;
     this.team2Score = 0;
     this.winner = null;
+    this.losser = null;
   }
 
   // Simulacija utakmice
@@ -37,12 +38,14 @@ export class Match {
       this.team1Score = winnerScore;
       this.team2Score = losserScore;
       this.winner = this.team1;
+      this.losser = this.team2;
       this.team1.addResult(true, this.team1Score, this.team2Score);
       this.team2.addResult(false, this.team2Score, this.team1Score);
     } else {
       this.team1Score = losserScore;
       this.team2Score = winnerScore;
       this.winner = this.team2;
+      this.losser = this.team1;
       this.team1.addResult(false, this.team1Score, this.team2Score);
       this.team2.addResult(true, this.team2Score, this.team1Score);
     }
