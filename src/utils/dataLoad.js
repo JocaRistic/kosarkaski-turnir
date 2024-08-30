@@ -8,3 +8,7 @@ function loadData(filePath) {
 export function loadGroups() {
   return loadData("src/data/groups.json");
 }
+
+export function loadExibitionMatches() {
+  return loadData("src/data/exibitions.json");
+}
