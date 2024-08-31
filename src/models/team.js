@@ -52,6 +52,19 @@ export class Team {
     }
   }
 
+  // Azuriranje podataka nakon predaje meca
+  addResultForSurrender(surrendered) {
+    if (surrendered) {
+      this.losses += 1;
+      this.points += 0;
+      this.receivedPoints += 10;
+    } else {
+      this.wins += 1;
+      this.points += 2;
+      this.scoredPoints += 10;
+    }
+  }
+
   // Dodaj rank tima nakon grupne faze
   addGroupRank(rank) {
     this.afterGroupRank = rank;
